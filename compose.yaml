@@ -1,0 +1,35 @@
+services:
+  wikijs-db:
+    image: postgres:18-alpine
+    container_name: wikijs-db
+    user: "1000:1000"
+    environment:
+      - POSTGRES_DB=wikijs
+      - POSTGRES_USER=wikijs_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      # BIND MOUNT: Guardará la base de datos en la carpeta local de tu servidor
+      - ./db:/var/lib/postgresql
+    restart: unless-stopped
+
+  wikijs:
+    image: lscr.io/linuxserver/wikijs:latest
+    container_name: wikijs
+    depends_on:
+      - wikijs-db
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - DB_TYPE=postgres
+      - DB_HOST=wikijs-db
+      - DB_PORT=5432
+      - DB_USER=wikijs_user
+      - DB_PASS=${POSTGRES_PASSWORD}
+      - DB_NAME=wikijs
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    ports:
+      - 3000:3000
+    restart: unless-stopped
