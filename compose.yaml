@@ -8,10 +8,10 @@ services:
       - POSTGRES_USER=wikijs_user
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      # BIND MOUNT: Guardará la base de datos en la carpeta local de tu servidor
       - ./db:/var/lib/postgresql
     restart: unless-stopped
-
+    networks:
+      - default
   wikijs:
     image: lscr.io/linuxserver/wikijs:latest
     container_name: wikijs
@@ -33,3 +33,11 @@ services:
     ports:
       - 3000:3000
     restart: unless-stopped
+    networks:
+      - proxy
+      - default
+
+networks:
+  default:
+  proxy:
+    external: true
